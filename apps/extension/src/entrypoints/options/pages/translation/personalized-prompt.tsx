@@ -203,6 +203,12 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
     clearCachePrompt()
   }
 
+  const appendToPrompt = (currentPrompt: string, text: string) => {
+    return currentPrompt
+      ? `${currentPrompt} ${text}`
+      : text
+  }
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -260,9 +266,11 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
-                  onClick={() => setPrompt({ ...prompt, prompt: prompt.prompt
-                    ? `${prompt.prompt} {{input}}`
-                    : '{{input}}' })}
+                  onClick={() =>
+                    setPrompt({
+                      ...prompt,
+                      prompt: appendToPrompt(prompt.prompt, '{{input}}'),
+                    })}
                 >
                   {'{{input}}'}
                 </Button>
@@ -275,9 +283,11 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
-                  onClick={() => setPrompt({ ...prompt, prompt: prompt.prompt
-                    ? `${prompt.prompt} {{targetLang}}`
-                    : '{{targetLang}}' })}
+                  onClick={() =>
+                    setPrompt({
+                      ...prompt,
+                      prompt: appendToPrompt(prompt.prompt, '{{targetLang}}'),
+                    })}
                 >
                   {'{{targetLang}}'}
                 </Button>
