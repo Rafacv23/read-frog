@@ -117,8 +117,9 @@ options:
       editPrompt:
         title: Edit Prompt
         name: Name
-        inputTooltip: Enter the text content of the paragraph
-        targetLangTooltip: Enter the target language
+        promptCellInput:
+          input: Enter the text content of the paragraph
+          targetLang: Enter the target language
         save: Save Changes
         close: Cancel
       deletePrompt:

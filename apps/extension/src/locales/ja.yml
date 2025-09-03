@@ -116,8 +116,9 @@ options:
       editPrompt:
         title: プロンプトを編集
         name: 名前
-        inputTooltip: 段落のテキスト内容を入力
-        targetLangTooltip: ターゲット言語を入力
+        promptCellInput:
+          input: 段落のテキスト内容を入力
+          targetLang: ターゲット言語を入力
         save: 保存
         close: キャンセル
       deletePrompt:

@@ -117,8 +117,9 @@ options:
       editPrompt:
         title: 프롬프트 편집
         name: 이름
-        inputTooltip: 단락의 텍스트 내용을 입력
-        targetLangTooltip: 대상 언어를 입력
+        promptCellInput:
+          input: 문단의 텍스트 내용을 입력
+          targetLang: 목표 언어를 입력
         save: 저장
         close: 취소
       deletePrompt:

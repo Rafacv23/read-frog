@@ -287,7 +287,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{i18n.t('options.translation.personalizedPrompt.editPrompt.inputTooltip')}</p>
+                <p>{i18n.t('options.translation.personalizedPrompt.editPrompt.promptCellInput.input')}</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -301,11 +301,11 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
                       prompt: appendToPrompt('{{targetLang}}'),
                     })}
                 >
-                  <p>{i18n.t('options.translation.personalizedPrompt.editPrompt.targetLangTooltip')}</p>
+                  {'{{targetLang}}'}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>The target language</p>
+                <p>{i18n.t('options.translation.personalizedPrompt.editPrompt.promptCellInput.targetLang')}</p>
               </TooltipContent>
             </Tooltip>
           </footer>
