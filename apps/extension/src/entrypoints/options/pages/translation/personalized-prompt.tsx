@@ -1,5 +1,5 @@
 import type { PromptConfigList } from '../../utils/prompt-file'
-import type { InsertableTextareaHandle, InsertableTextareaProps, TranslatePromptObj } from '@/types/config/provider'
+import type { InsertableTextareaHandle, InsertableTextareaProps, PromptInsertButtonProps, TranslatePromptObj } from '@/types/config/provider'
 import { i18n, useRef } from '#imports'
 import { Icon } from '@iconify/react'
 import {
@@ -195,6 +195,25 @@ function InsertableTextArea({ ref, value, disabled, className, onChange }: Inser
   )
 }
 
+function PromptInsertButton({ label, tooltip, disabled, onInsert }: PromptInsertButtonProps) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="outline"
+          disabled={disabled}
+          onClick={onInsert}
+        >
+          {label}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{tooltip}</p>
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
 function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }) {
   const [translateConfig, setTranslateConfig] = useAtom(configFields.translate)
   const textareaRef = useRef<InsertableTextareaHandle | null>(null)
@@ -287,34 +306,18 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
             </div>
           </div>
           <div className="flex gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  disabled={isDefaultPrompt(prompt.id)}
-                  onClick={() => textareaRef.current?.insertAtCursor('{{input}}')}
-                >
-                  {'{{input}}'}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{i18n.t('options.translation.personalizedPrompt.editPrompt.promptCellInput.input')}</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  disabled={isDefaultPrompt(prompt.id)}
-                  onClick={() => textareaRef.current?.insertAtCursor('{{targetLang}}')}
-                >
-                  {'{{targetLang}}'}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{i18n.t('options.translation.personalizedPrompt.editPrompt.promptCellInput.targetLang')}</p>
-              </TooltipContent>
-            </Tooltip>
+            <PromptInsertButton
+              label="{{input}}"
+              tooltip={i18n.t('options.translation.personalizedPrompt.editPrompt.promptCellInput.input')}
+              disabled={isDefaultPrompt(prompt.id)}
+              onInsert={() => textareaRef.current?.insertAtCursor('{{input}}')}
+            />
+            <PromptInsertButton
+              label="{{targetLang}}"
+              tooltip={i18n.t('options.translation.personalizedPrompt.editPrompt.promptCellInput.targetLang')}
+              disabled={isDefaultPrompt(prompt.id)}
+              onInsert={() => textareaRef.current?.insertAtCursor('{{targetLang}}')}
+            />
           </div>
         </SheetHeader>
         <SheetFooter>

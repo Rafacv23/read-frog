@@ -165,6 +165,13 @@ export interface InsertableTextareaHandle {
   insertAtCursor: (text: string) => void
 }
 
+export interface PromptInsertButtonProps {
+  label: string
+  tooltip: string
+  disabled: boolean
+  onInsert: () => void
+}
+
 export const promptsConfigSchema = z.object({
   prompt: z.string(),
   patterns: z.array(
