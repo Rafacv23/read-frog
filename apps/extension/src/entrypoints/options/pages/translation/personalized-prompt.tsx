@@ -277,7 +277,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>The text content of the paragraph</p>
+                <p>{i18n.t('options.translation.personalizedPrompt.editPrompt.inputTooltip')}</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -291,7 +291,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
                       prompt: appendToPrompt(prompt.prompt, '{{targetLang}}'),
                     })}
                 >
-                  {'{{targetLang}}'}
+                  <p>{i18n.t('options.translation.personalizedPrompt.editPrompt.targetLangTooltip')}</p>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
