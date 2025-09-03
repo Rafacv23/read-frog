@@ -266,6 +266,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
+                  disabled={isDefaultPrompt(prompt.id)}
                   onClick={() =>
                     setPrompt({
                       ...prompt,
@@ -283,6 +284,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
+                  disabled={isDefaultPrompt(prompt.id)}
                   onClick={() =>
                     setPrompt({
                       ...prompt,
