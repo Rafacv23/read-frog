@@ -1,6 +1,6 @@
 import type { PromptConfigList } from '../../utils/prompt-file'
 import type { TranslatePromptObj } from '@/types/config/provider'
-import { i18n } from '#imports'
+import { i18n, useRef } from '#imports'
 import { Icon } from '@iconify/react'
 import {
   AlertDialog,
@@ -162,6 +162,7 @@ function DeletePrompt({ originPrompt }: { originPrompt: TranslatePromptObj }) {
 
 function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }) {
   const [translateConfig, setTranslateConfig] = useAtom(configFields.translate)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const inEdit = !!originPrompt
 
@@ -203,10 +204,18 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
     clearCachePrompt()
   }
 
-  const appendToPrompt = (currentPrompt: string, text: string) => {
-    return currentPrompt
-      ? `${currentPrompt} ${text}`
-      : text
+  const appendToPrompt = (text: string) => {
+    const textarea = textareaRef.current
+    if (!textarea)
+      return prompt.prompt ? `${prompt.prompt} ${text}` : text
+
+    const { selectionStart, selectionEnd } = textarea
+    const value = prompt.prompt || ''
+    return (
+      value.slice(0, selectionStart)
+      + text
+      + value.slice(selectionEnd)
+    )
   }
 
   return (
@@ -249,6 +258,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
               <Label htmlFor="prompt">Prompt</Label>
               <Textarea
                 id="prompt"
+                ref={textareaRef}
                 disabled={isDefaultPrompt(prompt.id)}
                 value={prompt.prompt}
                 className="max-h-100"
@@ -270,7 +280,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
                   onClick={() =>
                     setPrompt({
                       ...prompt,
-                      prompt: appendToPrompt(prompt.prompt, '{{input}}'),
+                      prompt: appendToPrompt('{{input}}'),
                     })}
                 >
                   {'{{input}}'}
@@ -288,7 +298,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
                   onClick={() =>
                     setPrompt({
                       ...prompt,
-                      prompt: appendToPrompt(prompt.prompt, '{{targetLang}}'),
+                      prompt: appendToPrompt('{{targetLang}}'),
                     })}
                 >
                   <p>{i18n.t('options.translation.personalizedPrompt.editPrompt.targetLangTooltip')}</p>
