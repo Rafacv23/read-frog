@@ -117,6 +117,8 @@ options:
       editPrompt:
         title: 編輯 Prompt
         name: 標題
+        inputTooltip: 段落的文本內容
+        targetLangTooltip: 目標語言
         save: 保存
         close: 取消
       deletePrompt:
