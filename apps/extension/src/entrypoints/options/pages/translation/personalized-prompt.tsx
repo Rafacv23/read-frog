@@ -1,5 +1,5 @@
 import type { PromptConfigList } from '../../utils/prompt-file'
-import type { TranslatePromptObj } from '@/types/config/provider'
+import type { InsertableTextareaHandle, InsertableTextareaProps, TranslatePromptObj } from '@/types/config/provider'
 import { i18n, useRef } from '#imports'
 import { Icon } from '@iconify/react'
 import {
@@ -37,7 +37,7 @@ import {
 import { Textarea } from '@repo/ui/components/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@repo/ui/components/tooltip'
 import { useAtom, useAtomValue } from 'jotai'
-import { useState } from 'react'
+import { useImperativeHandle, useState } from 'react'
 import { toast } from 'sonner'
 import { configFields } from '@/utils/atoms/config'
 import { DEFAULT_TRANSLATE_PROMPT_ID } from '@/utils/constants/prompt'
@@ -160,9 +160,44 @@ function DeletePrompt({ originPrompt }: { originPrompt: TranslatePromptObj }) {
   )
 }
 
+function InsertableTextArea({ ref, value, disabled, className, onChange }: InsertableTextareaProps & { ref?: React.RefObject<InsertableTextareaHandle | null> }) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useImperativeHandle(ref, () => ({
+    insertAtCursor: (text: string) => {
+      const textarea = textareaRef.current
+      if (!textarea)
+        return
+
+      const { selectionStart, selectionEnd } = textarea
+      const newValue
+          = value.slice(0, selectionStart)
+            + text
+            + value.slice(selectionEnd)
+
+      onChange(newValue)
+      setTimeout(() => {
+        const pos = selectionStart + text.length
+        textarea.setSelectionRange(pos, pos)
+        textarea.focus()
+      }, 0)
+    },
+  }))
+
+  return (
+    <Textarea
+      ref={textareaRef}
+      disabled={disabled}
+      value={value}
+      className={className}
+      onChange={e => onChange(e.target.value)}
+    />
+  )
+}
+
 function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }) {
   const [translateConfig, setTranslateConfig] = useAtom(configFields.translate)
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const textareaRef = useRef<InsertableTextareaHandle | null>(null)
 
   const inEdit = !!originPrompt
 
@@ -204,20 +239,6 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
     clearCachePrompt()
   }
 
-  const appendToPrompt = (text: string) => {
-    const textarea = textareaRef.current
-    if (!textarea)
-      return prompt.prompt ? `${prompt.prompt} ${text}` : text
-
-    const { selectionStart, selectionEnd } = textarea
-    const value = prompt.prompt || ''
-    return (
-      value.slice(0, selectionStart)
-      + text
-      + value.slice(selectionEnd)
-    )
-  }
-
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -256,32 +277,22 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
             </div>
             <div className="grid gap-3">
               <Label htmlFor="prompt">Prompt</Label>
-              <Textarea
-                id="prompt"
+              <InsertableTextArea
                 ref={textareaRef}
-                disabled={isDefaultPrompt(prompt.id)}
                 value={prompt.prompt}
+                disabled={isDefaultPrompt(prompt.id)}
                 className="max-h-100"
-                onChange={(e) => {
-                  setPrompt({
-                    ...prompt,
-                    prompt: e.target.value,
-                  })
-                }}
+                onChange={val => setPrompt({ ...prompt, prompt: val })}
               />
             </div>
           </div>
-          <footer className="flex gap-2">
+          <div className="flex gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
                   disabled={isDefaultPrompt(prompt.id)}
-                  onClick={() =>
-                    setPrompt({
-                      ...prompt,
-                      prompt: appendToPrompt('{{input}}'),
-                    })}
+                  onClick={() => textareaRef.current?.insertAtCursor('{{input}}')}
                 >
                   {'{{input}}'}
                 </Button>
@@ -295,11 +306,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
                 <Button
                   variant="outline"
                   disabled={isDefaultPrompt(prompt.id)}
-                  onClick={() =>
-                    setPrompt({
-                      ...prompt,
-                      prompt: appendToPrompt('{{targetLang}}'),
-                    })}
+                  onClick={() => textareaRef.current?.insertAtCursor('{{targetLang}}')}
                 >
                   {'{{targetLang}}'}
                 </Button>
@@ -308,7 +315,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
                 <p>{i18n.t('options.translation.personalizedPrompt.editPrompt.promptCellInput.targetLang')}</p>
               </TooltipContent>
             </Tooltip>
-          </footer>
+          </div>
         </SheetHeader>
         <SheetFooter>
           <SheetClose asChild>
