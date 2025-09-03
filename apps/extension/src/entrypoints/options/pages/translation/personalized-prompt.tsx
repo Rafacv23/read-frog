@@ -35,6 +35,7 @@ import {
   SheetTrigger,
 } from '@repo/ui/components/sheet'
 import { Textarea } from '@repo/ui/components/textarea'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@repo/ui/components/tooltip'
 import { useAtom, useAtomValue } from 'jotai'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -254,6 +255,38 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
               />
             </div>
           </div>
+          <footer className="flex gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => setPrompt({ ...prompt, prompt: prompt.prompt
+                    ? `${prompt.prompt} {{input}}`
+                    : '{{input}}' })}
+                >
+                  {'{{input}}'}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>The text content of the paragraph</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => setPrompt({ ...prompt, prompt: prompt.prompt
+                    ? `${prompt.prompt} {{targetLang}}`
+                    : '{{targetLang}}' })}
+                >
+                  {'{{targetLang}}'}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>The target language</p>
+              </TooltipContent>
+            </Tooltip>
+          </footer>
         </SheetHeader>
         <SheetFooter>
           <SheetClose asChild>
