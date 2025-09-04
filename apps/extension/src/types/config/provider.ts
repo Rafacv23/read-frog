@@ -148,30 +148,6 @@ export const translatePromptObjSchema = z.object({
 })
 export type TranslatePromptObj = z.infer<typeof translatePromptObjSchema>
 
-export const insertableTextareaPropsSchema = z.object({
-  value: z.string(),
-  disabled: z.boolean().optional(),
-  className: z.string().optional(),
-})
-
-export interface InsertableTextareaProps {
-  value: string
-  disabled?: boolean
-  className?: string
-  onChange: (value: string) => void
-}
-
-export interface InsertableTextareaHandle {
-  insertAtCursor: (text: string) => void
-}
-
-export interface PromptInsertButtonProps {
-  label: string
-  tooltip: string
-  disabled: boolean
-  onInsert: () => void
-}
-
 export const promptsConfigSchema = z.object({
   prompt: z.string(),
   patterns: z.array(
