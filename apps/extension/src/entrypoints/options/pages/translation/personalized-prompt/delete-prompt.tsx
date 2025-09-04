@@ -30,21 +30,21 @@ export function DeletePrompt({ originPrompt }: { originPrompt: TranslatePromptOb
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            {i18n.t('options.translation.personalizedPrompt.deletePrompt.title')}
+            {i18n.t('options.translation.personalizedPrompts.deletePrompt.title')}
             {' '}
             :
             {' '}
             {originPrompt.name}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            {i18n.t('options.translation.personalizedPrompt.deletePrompt.description')}
+            {i18n.t('options.translation.personalizedPrompts.deletePrompt.description')}
             {' '}
             ?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{i18n.t('options.translation.personalizedPrompt.deletePrompt.cancel')}</AlertDialogCancel>
-          <AlertDialogAction onClick={deletePrompt}>{i18n.t('options.translation.personalizedPrompt.deletePrompt.confirm')}</AlertDialogAction>
+          <AlertDialogCancel>{i18n.t('options.translation.personalizedPrompts.deletePrompt.cancel')}</AlertDialogCancel>
+          <AlertDialogAction onClick={deletePrompt}>{i18n.t('options.translation.personalizedPrompts.deletePrompt.confirm')}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

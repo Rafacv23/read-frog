@@ -26,7 +26,7 @@ export function ExportPrompts({ selectedPrompts }: { selectedPrompts: string[] }
       disabled={!selectedPrompts.length}
     >
       <Icon icon="tabler:file-upload" className="size-4" />
-      {i18n.t('options.translation.personalizedPrompt.export')}
+      {i18n.t('options.translation.personalizedPrompts.export')}
     </Button>
   )
 }

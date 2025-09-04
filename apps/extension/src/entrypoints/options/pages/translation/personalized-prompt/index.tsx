@@ -26,7 +26,7 @@ import { useAtom, useAtomValue } from 'jotai'
 import { useState } from 'react'
 import { QuickInsertableTextarea } from '@/components/ui/insertable-textarea'
 import { configFields } from '@/utils/atoms/config'
-import { DEFAULT_TRANSLATE_PROMPT_ID } from '@/utils/constants/prompt'
+import { DEFAULT_TRANSLATE_PROMPT_ID, getTokenCellText, TOKENS } from '@/utils/constants/prompt'
 import { ConfigCard } from '../../../components/config-card'
 import { DeletePrompt } from './delete-prompt'
 import { ExportPrompts } from './export-prompt'
@@ -36,7 +36,7 @@ const isDefaultPrompt = (id: string) => id === DEFAULT_TRANSLATE_PROMPT_ID
 
 export function PersonalizedPrompts() {
   return (
-    <ConfigCard className="lg:flex-col" title={i18n.t('options.translation.personalizedPrompt.title')} description={i18n.t('options.translation.personalizedPrompt.description')}>
+    <ConfigCard className="lg:flex-col" title={i18n.t('options.translation.personalizedPrompts.title')} description={i18n.t('options.translation.personalizedPrompts.description')}>
       <PromptList />
     </ConfigCard>
   )
@@ -60,12 +60,12 @@ function PromptList() {
           patterns.map(pattern => (
             <Card className="h-fit gap-4" key={pattern.id}>
               <CardHeader className="grid-rows-1">
-                <CardTitle className="leading-relaxed">
+                <CardTitle className="leading-relaxed w-full min-w-0">
                   {
                     isDefaultPrompt(pattern.id)
-                      ? i18n.t('options.translation.personalizedPrompt.default')
+                      ? i18n.t('options.translation.personalizedPrompts.default')
                       : (
-                          <div className="truncate leading-relaxed gap-3 flex items-center">
+                          <div className="leading-relaxed gap-3 flex items-center w-full">
                             <Checkbox
                               id={`translate-prompt-${pattern.id}`}
                               checked={selectedPrompts.includes(pattern.id)}
@@ -78,7 +78,9 @@ function PromptList() {
                               }}
                             >
                             </Checkbox>
-                            {pattern.name}
+                            <span className="flex-1 min-w-0 truncate" title={pattern.name}>
+                              {pattern.name}
+                            </span>
                           </div>
                         )
                   }
@@ -112,12 +114,12 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
   const [prompt, setPrompt] = useState<TranslatePromptObj>(originPrompt ?? { id: crypto.randomUUID(), name: '', prompt: '' })
 
   const promptName = isDefaultPrompt(prompt.id)
-    ? i18n.t('options.translation.personalizedPrompt.default')
+    ? i18n.t('options.translation.personalizedPrompts.default')
     : prompt.name
 
   const sheetTitle = inEdit
-    ? i18n.t('options.translation.personalizedPrompt.editPrompt.title')
-    : i18n.t('options.translation.personalizedPrompt.addPrompt')
+    ? i18n.t('options.translation.personalizedPrompts.editPrompt.title')
+    : i18n.t('options.translation.personalizedPrompts.addPrompt')
 
   const clearCachePrompt = () => {
     setPrompt({
@@ -160,7 +162,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
             : (
                 <Button>
                   <Icon icon="tabler:plus" className="size-4" />
-                  {i18n.t('options.translation.personalizedPrompt.addPrompt')}
+                  {i18n.t('options.translation.personalizedPrompts.addPrompt')}
                 </Button>
               )
         }
@@ -170,7 +172,7 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
           <SheetTitle>{sheetTitle}</SheetTitle>
           <div className="grid flex-1 auto-rows-min gap-6 py-6">
             <div className="grid gap-3">
-              <Label htmlFor="prompt-name">{i18n.t('options.translation.personalizedPrompt.editPrompt.name')}</Label>
+              <Label htmlFor="prompt-name">{i18n.t('options.translation.personalizedPrompts.editPrompt.name')}</Label>
               <Input
                 id="prompt-name"
                 value={promptName}
@@ -190,26 +192,20 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
                 disabled={isDefaultPrompt(prompt.id)}
                 className="max-h-100"
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setPrompt({ ...prompt, prompt: e.target.value })}
-                insertCells={[
-                  {
-                    text: '{{input}}',
-                    description: i18n.t('options.translation.personalizedPrompt.editPrompt.promptCellInput.input'),
-                  },
-                  {
-                    text: '{{targetLang}}',
-                    description: i18n.t('options.translation.personalizedPrompt.editPrompt.promptCellInput.targetLang'),
-                  },
-                ]}
+                insertCells={TOKENS.map(token => ({
+                  text: getTokenCellText(token),
+                  description: i18n.t(`options.translation.personalizedPrompts.editPrompt.promptCellInput.${token}`),
+                }))}
               />
             </div>
           </div>
         </SheetHeader>
         <SheetFooter>
           <SheetClose asChild>
-            <Button disabled={isDefaultPrompt(prompt.id)} onClick={configurePrompt}>{i18n.t('options.translation.personalizedPrompt.editPrompt.save')}</Button>
+            <Button disabled={isDefaultPrompt(prompt.id)} onClick={configurePrompt}>{i18n.t('options.translation.personalizedPrompts.editPrompt.save')}</Button>
           </SheetClose>
           <SheetClose asChild>
-            <Button disabled={isDefaultPrompt(prompt.id)} variant="outline">{i18n.t('options.translation.personalizedPrompt.editPrompt.close')}</Button>
+            <Button disabled={isDefaultPrompt(prompt.id)} variant="outline">{i18n.t('options.translation.personalizedPrompts.editPrompt.close')}</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

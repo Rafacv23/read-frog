@@ -34,7 +34,7 @@ export function ImportPrompts() {
         return
       const config = await analysisJSONFile(files[0])
       injectPrompts(config)
-      toast.success(`${i18n.t('options.translation.personalizedPrompt.importSuccess')} !`)
+      toast.success(`${i18n.t('options.translation.personalizedPrompts.importSuccess')} !`)
     }
     catch (error) {
       if (error instanceof Error) {
@@ -54,7 +54,7 @@ export function ImportPrompts() {
     <Button variant="outline" className="p-0">
       <Label htmlFor="import-file" className="w-full px-3">
         <Icon icon="tabler:file-download" className="size-4" />
-        {i18n.t('options.translation.personalizedPrompt.import')}
+        {i18n.t('options.translation.personalizedPrompts.import')}
       </Label>
       <Input
         type="file"
