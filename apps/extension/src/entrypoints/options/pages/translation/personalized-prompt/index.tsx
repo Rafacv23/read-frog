@@ -1,18 +1,6 @@
-import type { PromptConfigList } from '../../utils/prompt-file'
 import type { InsertableTextareaHandle, InsertableTextareaProps, PromptInsertButtonProps, TranslatePromptObj } from '@/types/config/provider'
 import { i18n, useRef } from '#imports'
 import { Icon } from '@iconify/react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@repo/ui/components/alert-dialog'
 import { Button } from '@repo/ui/components/button'
 import {
   Card,
@@ -38,15 +26,16 @@ import { Textarea } from '@repo/ui/components/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@repo/ui/components/tooltip'
 import { useAtom, useAtomValue } from 'jotai'
 import { useImperativeHandle, useState } from 'react'
-import { toast } from 'sonner'
 import { configFields } from '@/utils/atoms/config'
 import { DEFAULT_TRANSLATE_PROMPT_ID } from '@/utils/constants/prompt'
-import { ConfigCard } from '../../components/config-card'
-import { analysisJSONFile, downloadJSONFile } from '../../utils/prompt-file'
+import { ConfigCard } from '../../../components/config-card'
+import { DeletePrompt } from './delete-prompt'
+import { ExportPrompts } from './export-prompt'
+import { ImportPrompts } from './import-prompt'
 
 const isDefaultPrompt = (id: string) => id === DEFAULT_TRANSLATE_PROMPT_ID
 
-export function PersonalizedPrompt() {
+export function PersonalizedPrompts() {
   return (
     <ConfigCard className="lg:flex-col" title={i18n.t('options.translation.personalizedPrompt.title')} description={i18n.t('options.translation.personalizedPrompt.description')}>
       <PromptList />
@@ -97,7 +86,8 @@ function PromptList() {
                 </CardTitle>
                 <CardAction className="leading-relaxed">
                   {
-                    isDefaultPrompt(pattern.id) ? <></> : <DeletePrompt originPrompt={pattern}></DeletePrompt>
+                    !isDefaultPrompt(pattern.id)
+                    && <DeletePrompt originPrompt={pattern} />
                   }
                 </CardAction>
               </CardHeader>
@@ -112,51 +102,6 @@ function PromptList() {
         }
       </div>
     </section>
-  )
-}
-
-function DeletePrompt({ originPrompt }: { originPrompt: TranslatePromptObj }) {
-  const [translateConfig, setTranslateConfig] = useAtom(configFields.translate)
-  const { patterns, prompt } = translateConfig.promptsConfig
-  const deletePrompt = () => {
-    setTranslateConfig({
-      promptsConfig: {
-        ...translateConfig.promptsConfig,
-        patterns: patterns.filter(p => p.id !== originPrompt.id),
-        prompt: prompt !== originPrompt.id ? prompt : DEFAULT_TRANSLATE_PROMPT_ID,
-      },
-    })
-  }
-
-  return (
-    <AlertDialog>
-      <AlertDialogTrigger>
-        <Button className="size-4" variant="ghost">
-          <Icon icon="tabler:trash" className="size-4"></Icon>
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            {i18n.t('options.translation.personalizedPrompt.deletePrompt.title')}
-            {' '}
-            :
-            {' '}
-            {originPrompt.name}
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            {i18n.t('options.translation.personalizedPrompt.deletePrompt.description')}
-            {' '}
-            ?
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>{i18n.t('options.translation.personalizedPrompt.deletePrompt.cancel')}</AlertDialogCancel>
-          <AlertDialogAction onClick={deletePrompt}>{i18n.t('options.translation.personalizedPrompt.deletePrompt.confirm')}</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-
   )
 }
 
@@ -330,90 +275,5 @@ function ConfigurePrompt({ originPrompt }: { originPrompt?: TranslatePromptObj }
         </SheetFooter>
       </SheetContent>
     </Sheet>
-  )
-}
-
-function ImportPrompts() {
-  const [translateConfig, setTranslateConfig] = useAtom(configFields.translate)
-
-  const injectPrompts = (list: PromptConfigList) => {
-    const originPatterns = translateConfig.promptsConfig.patterns
-    const patterns = list.map(item => ({
-      ...item,
-      id: crypto.randomUUID(),
-    }))
-
-    setTranslateConfig({
-      promptsConfig: {
-        ...translateConfig.promptsConfig,
-        patterns: [...originPatterns, ...patterns],
-      },
-    })
-  }
-
-  const importPrompts = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const files = e.target.files
-      if (!files || !files[0])
-        return
-      const config = await analysisJSONFile(files[0])
-      injectPrompts(config)
-      toast.success(`${i18n.t('options.translation.personalizedPrompt.importSuccess')} !`)
-    }
-    catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message)
-      }
-      else {
-        toast.error('Something went error when importing')
-      }
-    }
-    finally {
-      e.target.value = ''
-      e.target.files = null
-    }
-  }
-
-  return (
-    <Button variant="outline" className="p-0">
-      <Label htmlFor="import-file" className="w-full px-3">
-        <Icon icon="tabler:file-download" className="size-4" />
-        {i18n.t('options.translation.personalizedPrompt.import')}
-      </Label>
-      <Input
-        type="file"
-        id="import-file"
-        className="hidden"
-        accept=".json"
-        onChange={importPrompts}
-      >
-      </Input>
-    </Button>
-  )
-}
-
-function ExportPrompts({ selectedPrompts }: { selectedPrompts: string[] }) {
-  const translateConfig = useAtomValue(configFields.translate)
-  const promptsConfig = translateConfig.promptsConfig
-  const patterns = promptsConfig.patterns
-
-  const sortOutDownloadPrompts = patterns
-    .filter(pattern => selectedPrompts.includes(pattern.id))
-    .map(pattern => ({
-      name: pattern.name,
-      prompt: pattern.prompt,
-    }))
-
-  return (
-    <Button
-      variant="outline"
-      onClick={() => {
-        downloadJSONFile(sortOutDownloadPrompts)
-      }}
-      disabled={!selectedPrompts.length}
-    >
-      <Icon icon="tabler:file-upload" className="size-4" />
-      {i18n.t('options.translation.personalizedPrompt.export')}
-    </Button>
   )
 }
